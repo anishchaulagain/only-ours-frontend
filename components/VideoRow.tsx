@@ -20,7 +20,7 @@ const VideoRow: React.FC<VideoRowProps> = ({ title, videos = [] }) => {
         {title}
       </h2>
       <div className="group relative">
-        <div className="flex space-x-4 overflow-x-scroll scrollbar-hide py-4">
+        <div className="flex space-x-4 overflow-x-scroll scrollbar-hide py-4 px-2">
           {videos.map((video) => (
             <Link href={`/watch/${video._id}`} key={video._id} className="cursor-pointer">
               <div

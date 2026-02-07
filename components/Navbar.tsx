@@ -53,7 +53,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-[100] transition-all duration-300 ${
         isScrolled ? "bg-black/90" : "bg-gradient-to-b from-black/80 to-transparent"
       }`}
     >
@@ -78,7 +78,10 @@ const Navbar = () => {
           <Bell className="w-5 h-5 cursor-pointer hover:text-gray-300 transition" />
               <div className="relative group">
                 <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDropdownOpen(!isDropdownOpen);
+                  }}
                   className="w-8 h-8 bg-blue-600 rounded cursor-pointer flex items-center justify-center font-bold uppercase focus:outline-none"
                 >
                   {user ? user.username[0] : "G"}
@@ -86,8 +89,11 @@ const Navbar = () => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-32 bg-black border border-gray-700 rounded shadow-xl z-50">
                     <button
-                      onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLogout();
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition text-left"
                     >
                       <LogOut className="w-4 h-4 mr-2" /> Logout
                     </button>

@@ -48,12 +48,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("user", JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
-    router.push(newUser.role === "admin" ? "/admin" : "/");
+    router.push(newUser.role === "admin" ? "/admin" : "/profiles");
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("selectedProfile");
     setToken(null);
     setUser(null);
     router.push("/login");

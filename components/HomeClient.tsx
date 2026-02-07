@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -15,10 +15,24 @@ interface HomeClientProps {
 export default function HomeClient({ videos, gallery }: HomeClientProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [greeting, setGreeting] = useState("");
+  const [profileName, setProfileName] = useState("");
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
+    } else if (user) {
+      const storedProfile = localStorage.getItem("selectedProfile");
+      if (!storedProfile) {
+        router.push("/profiles");
+      } else {
+        setProfileName(storedProfile);
+        
+        const hour = new Date().getHours();
+        if (hour < 12) setGreeting("Good Morning");
+        else if (hour < 18) setGreeting("Good Afternoon");
+        else setGreeting("Good Evening");
+      }
     }
   }, [user, isLoading, router]);
 
@@ -50,6 +64,11 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
 
         <div className="absolute bottom-[20%] left-4 md:left-16 max-w-xl space-y-4">
+          {profileName && (
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-200 drop-shadow-md mb-2">
+              {greeting}, {profileName}
+            </h2>
+          )}
           <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg">DIPANS ORGINAL</h1>
           <p className="text-sm md:text-lg text-gray-200 drop-shadow-md">
             Dive into the world of cinematic excellence. Experience the thrill, the drama, and the emotion of the best stories ever told. Only on DIPANS.
