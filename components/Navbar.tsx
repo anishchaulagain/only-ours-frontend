@@ -7,7 +7,33 @@ import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    setIsDropdownOpen(false);
+    logout();
+  };
+
+  useEffect(() => {
+    const closeDropdown = (e: MouseEvent) => {
+      // Close if clicking anywhere outside (simplified)
+      // In a real app, check if target is inside the dropdown ref
+       if (isDropdownOpen) {
+          setIsDropdownOpen(false);
+       }
+    };
+    
+    // Add a small delay/check or use a specific ref to avoid immediate closing if clicking the toggle button
+    // For simplicity, we'll just rely on the toggle button's onClick (which might need stopPropagation if we use window click)
+    // Actually, a better way for "click outside" without refs for this specific snippet:
+    if(isDropdownOpen) {
+        window.addEventListener('click', closeDropdown);
+    }
+    
+    return () => window.removeEventListener('click', closeDropdown);
+  }, [isDropdownOpen]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,14 +76,24 @@ const Navbar = () => {
             {user ? user.username : "Guest"}
           </span>
           <Bell className="w-5 h-5 cursor-pointer hover:text-gray-300 transition" />
-          <div className="w-8 h-8 bg-blue-600 rounded cursor-pointer overflow-hidden flex items-center justify-center font-bold uppercase relative group">
-             {user ? user.username[0] : "G"}
-             <div className="absolute right-0 top-full mt-2 w-32 bg-black border border-gray-700 rounded shadow-xl opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto">
-                <button onClick={logout} className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800">
-                   <LogOut className="w-4 h-4 mr-2" /> Logout
+              <div className="relative group">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="w-8 h-8 bg-blue-600 rounded cursor-pointer flex items-center justify-center font-bold uppercase focus:outline-none"
+                >
+                  {user ? user.username[0] : "G"}
                 </button>
-             </div>
-          </div>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-32 bg-black border border-gray-700 rounded shadow-xl z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
         </div>
       </div>
     </nav>
