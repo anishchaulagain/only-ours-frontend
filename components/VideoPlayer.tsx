@@ -16,8 +16,6 @@ export default function VideoPlayer({ videoUrl, poster }: VideoPlayerProps) {
     return () => {
       if (videoElement) {
         videoElement.pause();
-        videoElement.removeAttribute("src");
-        videoElement.load();
       }
     };
   }, []);
