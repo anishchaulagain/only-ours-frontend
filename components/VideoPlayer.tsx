@@ -15,7 +15,9 @@ export default function VideoPlayer({ videoUrl, poster }: VideoPlayerProps) {
 
     if (videoElement) {
       videoElement.play().catch((error) => {
-        console.error("Autoplay failed:", error);
+        if (error.name !== "AbortError") {
+          console.error("Autoplay failed:", error);
+        }
       });
     }
 
