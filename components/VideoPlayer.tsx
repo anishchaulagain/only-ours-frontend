@@ -13,6 +13,12 @@ export default function VideoPlayer({ videoUrl, poster }: VideoPlayerProps) {
   useEffect(() => {
     const videoElement = videoRef.current;
 
+    if (videoElement) {
+      videoElement.play().catch((error) => {
+        console.error("Autoplay failed:", error);
+      });
+    }
+
     return () => {
       if (videoElement) {
         videoElement.pause();
