@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import VideoPlayer from "@/components/VideoPlayer";
 
 async function getVideo(id: string) {
   try {
@@ -41,15 +42,7 @@ export default async function WatchPage({ params }: { params: Promise<{ id: stri
 
       {/* Video Player */}
       <div className="w-full h-screen flex items-center justify-center">
-        <video
-          className="w-full h-full object-contain focus:outline-none"
-          controls
-          autoPlay
-          src={video.videoUrl}
-          poster={video.thumbnailUrl}
-        >
-          Your browser does not support the video tag.
-        </video>
+        <VideoPlayer videoUrl={video.videoUrl} poster={video.thumbnailUrl} />
       </div>
     </div>
   );
