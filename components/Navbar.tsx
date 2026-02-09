@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Bell, Search, LogOut } from "lucide-react";
+import { Search, Bell, ChevronDown, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
@@ -20,50 +20,70 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-[100] transition-all duration-700 ${
-        isScrolled ? "bg-[#1C1917]/90 backdrop-blur-md py-4 shadow-md" : "bg-transparent py-6"
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled 
+          ? "bg-[#0a0a0a]/95 backdrop-blur-sm" 
+          : "bg-gradient-to-b from-[#0a0a0a]/80 to-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 md:px-16 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-        
-        {/* Left Links */}
-        <div className="hidden md:flex space-x-8">
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/story">Our Story</NavLink>
+      <div className="flex items-center justify-between px-4 md:px-12 lg:px-16 h-16">
+        {/* Left Section */}
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <Link 
+            href="/" 
+            className="text-2xl font-bold text-white hover:text-[#DC2626] transition-colors"
+          >
+            D<span className="text-[#DC2626]">&</span>D
+          </Link>
+          
+          {/* Nav Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <NavLink href="/" active>Home</NavLink>
+            <NavLink href="/gallery">Gallery</NavLink>
+            <NavLink href="/story">Our Story</NavLink>
+          </div>
         </div>
 
-        {/* Logo */}
-        <Link href="/" className="text-3xl md:text-5xl font-serif font-bold text-[#F5E6D3] tracking-widest hover:text-[#BE123C] transition-colors duration-500">
-          D<span className="text-[#BE123C]">&</span>D
-        </Link>
-
-        {/* Right Links & User */}
-        <div className="flex items-center space-x-8">
-          <div className="hidden md:flex space-x-8">
-             <NavLink href="/gallery">Gallery</NavLink>
-             <NavLink href="/bucket-list">Dreams</NavLink>
-          </div>
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
+          {/* Search */}
+          <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <Search className="w-5 h-5" />
+          </button>
           
-          {/* User Profile */}
-          <div className="relative group">
+          {/* Notifications */}
+          <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <Bell className="w-5 h-5" />
+          </button>
+          
+          {/* Profile Dropdown */}
+          <div className="relative">
             <button 
-               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-               className="flex items-center space-x-2 focus:outline-none"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 focus:outline-none"
             >
-              <div className="w-8 h-8 rounded-full bg-[#BE123C] flex items-center justify-center text-[#FFE4E6] font-serif font-bold border border-[#FFE4E6]/20">
-                {user ? user.username[0] : "G"}
+              <div className="w-8 h-8 rounded bg-[#DC2626] flex items-center justify-center text-white font-medium text-sm">
+                {user ? user.username[0].toUpperCase() : "G"}
               </div>
+              <ChevronDown className={`w-4 h-4 text-white transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
             </button>
-             {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-4 w-40 bg-[#292524] border border-[#44403C] rounded-none shadow-xl z-50 py-2">
-                  <button
-                    onClick={logout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-[#F5E6D3] hover:bg-[#BE123C]/20 hover:text-[#BE123C] transition font-sans tracking-wide"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" /> Sign Out
-                  </button>
+            
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-[#141414] border border-[#262626] rounded shadow-xl z-50 py-1">
+                <div className="px-4 py-3 border-b border-[#262626]">
+                  <p className="text-sm font-medium text-white">{user?.username}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
-              )}
+                <button
+                  onClick={logout}
+                  className="flex items-center w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1a1a1a] hover:text-white transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  Sign Out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -71,14 +91,27 @@ const Navbar = () => {
   );
 };
 
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link 
-    href={href} 
-    className="text-[#F5E6D3]/80 hover:text-[#BE123C] font-sans text-sm tracking-[0.2em] uppercase transition-all duration-300 relative group"
-  >
-    {children}
-    <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-[#BE123C] transition-all duration-300 group-hover:w-full" />
-  </Link>
-);
+function NavLink({ 
+  href, 
+  children, 
+  active = false 
+}: { 
+  href: string; 
+  children: React.ReactNode;
+  active?: boolean;
+}) {
+  return (
+    <Link 
+      href={href} 
+      className={`text-sm font-medium transition-colors ${
+        active 
+          ? "text-white" 
+          : "text-gray-400 hover:text-gray-200"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export default Navbar;
