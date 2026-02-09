@@ -7,103 +7,78 @@ import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    setIsDropdownOpen(false);
-    logout();
-  };
-
-  useEffect(() => {
-    const closeDropdown = (e: MouseEvent) => {
-      // Close if clicking anywhere outside (simplified)
-      // In a real app, check if target is inside the dropdown ref
-       if (isDropdownOpen) {
-          setIsDropdownOpen(false);
-       }
-    };
-    
-    // Add a small delay/check or use a specific ref to avoid immediate closing if clicking the toggle button
-    // For simplicity, we'll just rely on the toggle button's onClick (which might need stopPropagation if we use window click)
-    // Actually, a better way for "click outside" without refs for this specific snippet:
-    if(isDropdownOpen) {
-        window.addEventListener('click', closeDropdown);
-    }
-    
-    return () => window.removeEventListener('click', closeDropdown);
-  }, [isDropdownOpen]);
-
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
-      className={`fixed top-0 w-full z-[100] transition-all duration-300 ${
-        isScrolled ? "bg-black/90" : "bg-gradient-to-b from-black/80 to-transparent"
+      className={`fixed top-0 w-full z-[100] transition-all duration-700 ${
+        isScrolled ? "bg-[#1C1917]/90 backdrop-blur-md py-4 shadow-md" : "bg-transparent py-6"
       }`}
     >
-      <div className="px-4 md:px-16 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="text-red-600 text-3xl font-bold cursor-pointer">
-            DIPANS
-          </Link>
-          <ul className="hidden md:flex space-x-4 text-sm font-light text-gray-300">
-            <li className="cursor-pointer hover:text-white transition">Home</li>
-            <li className="cursor-pointer hover:text-white transition">Series</li>
-            <li className="cursor-pointer hover:text-white transition">Films</li>
-            <li className="cursor-pointer hover:text-white transition">New & Popular</li>
-            <li className="cursor-pointer hover:text-white transition">My List</li>
-          </ul>
+      <div className="container mx-auto px-4 md:px-16 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+        
+        {/* Left Links */}
+        <div className="hidden md:flex space-x-8">
+          <NavLink href="/">Home</NavLink>
+          <NavLink href="/story">Our Story</NavLink>
         </div>
-        <div className="flex items-center space-x-4 text-white">
-          <Search className="w-5 h-5 cursor-pointer hover:text-gray-300 transition" />
-          <span className="text-sm cursor-pointer hover:text-gray-300 transition hidden sm:inline">
-            {user ? user.username : "Guest"}
-          </span>
-          <Bell className="w-5 h-5 cursor-pointer hover:text-gray-300 transition" />
-              <div className="relative group">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsDropdownOpen(!isDropdownOpen);
-                  }}
-                  className="w-8 h-8 bg-blue-600 rounded cursor-pointer flex items-center justify-center font-bold uppercase focus:outline-none"
-                >
-                  {user ? user.username[0] : "G"}
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-32 bg-black border border-gray-700 rounded shadow-xl z-50">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLogout();
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition text-left"
-                    >
-                      <LogOut className="w-4 h-4 mr-2" /> Logout
-                    </button>
-                  </div>
-                )}
+
+        {/* Logo */}
+        <Link href="/" className="text-3xl md:text-5xl font-serif font-bold text-[#F5E6D3] tracking-widest hover:text-[#BE123C] transition-colors duration-500">
+          D<span className="text-[#BE123C]">&</span>D
+        </Link>
+
+        {/* Right Links & User */}
+        <div className="flex items-center space-x-8">
+          <div className="hidden md:flex space-x-8">
+             <NavLink href="/gallery">Gallery</NavLink>
+             <NavLink href="/bucket-list">Dreams</NavLink>
+          </div>
+          
+          {/* User Profile */}
+          <div className="relative group">
+            <button 
+               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+               className="flex items-center space-x-2 focus:outline-none"
+            >
+              <div className="w-8 h-8 rounded-full bg-[#BE123C] flex items-center justify-center text-[#FFE4E6] font-serif font-bold border border-[#FFE4E6]/20">
+                {user ? user.username[0] : "G"}
               </div>
+            </button>
+             {isDropdownOpen && (
+                <div className="absolute right-0 top-full mt-4 w-40 bg-[#292524] border border-[#44403C] rounded-none shadow-xl z-50 py-2">
+                  <button
+                    onClick={logout}
+                    className="flex items-center w-full px-4 py-2 text-sm text-[#F5E6D3] hover:bg-[#BE123C]/20 hover:text-[#BE123C] transition font-sans tracking-wide"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" /> Sign Out
+                  </button>
+                </div>
+              )}
+          </div>
         </div>
       </div>
     </nav>
   );
 };
+
+const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <Link 
+    href={href} 
+    className="text-[#F5E6D3]/80 hover:text-[#BE123C] font-sans text-sm tracking-[0.2em] uppercase transition-all duration-300 relative group"
+  >
+    {children}
+    <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-[#BE123C] transition-all duration-300 group-hover:w-full" />
+  </Link>
+);
 
 export default Navbar;
