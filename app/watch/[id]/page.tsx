@@ -6,7 +6,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 
 async function getVideo(id: string) {
   try {
-    const res = await fetch(`http://localhost:5000/api/videos/${id}`, { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/${id}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch (e) {

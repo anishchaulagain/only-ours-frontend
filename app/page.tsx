@@ -2,7 +2,7 @@ import HomeClient from "@/components/HomeClient";
 
 async function getVideos() {
   try {
-    const res = await fetch("http://localhost:5000/api/videos", { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch (e) {
@@ -13,7 +13,7 @@ async function getVideos() {
 
 async function getGallery() {
   try {
-    const res = await fetch("http://localhost:5000/api/gallery", { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/gallery`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch (e) {

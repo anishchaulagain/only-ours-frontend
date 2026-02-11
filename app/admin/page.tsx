@@ -38,9 +38,9 @@ export default function AdminPage() {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [usersRes, videosRes, galleryRes] = await Promise.all([
-        fetch("http://localhost:5000/api/users", { headers }),
-        fetch("http://localhost:5000/api/videos"),
-        fetch("http://localhost:5000/api/gallery"),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/gallery`),
       ]);
 
       const usersData = await usersRes.json();
@@ -62,7 +62,7 @@ export default function AdminPage() {
   const handleDelete = async (endpoint: string, id: string) => {
     if (!confirm("Are you sure?")) return;
     try {
-        await fetch(`http://localhost:5000/api/${endpoint}/${id}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/${endpoint}/${id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -75,7 +75,7 @@ export default function AdminPage() {
   const handleCreateUser = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
-          await fetch("http://localhost:5000/api/users", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
               body: JSON.stringify(newUser)
@@ -89,7 +89,7 @@ export default function AdminPage() {
   const handleCreateVideo = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
-          await fetch("http://localhost:5000/api/videos", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`, {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
               body: JSON.stringify(newVideo)
@@ -103,7 +103,7 @@ export default function AdminPage() {
   const handleCreateImage = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
-          await fetch("http://localhost:5000/api/gallery", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/gallery`, {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
               body: JSON.stringify(newImage)

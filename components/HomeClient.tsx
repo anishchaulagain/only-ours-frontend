@@ -78,9 +78,9 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
             Dive into the world of cinematic excellence. Experience the thrill, the drama, and the emotion of the best stories ever told. Only on DIPANS.
           </p>
           <div className="flex space-x-3 mt-4">
-            {trending.length > 0 && (
+            {videos.length > 0 && (
               <button 
-                onClick={() => router.push(`/watch/${trending[0]._id}`)}
+                onClick={() => router.push(`/watch/${videos[0]._id}`)}
                 className="flex items-center px-6 py-2 bg-white text-black rounded font-semibold hover:bg-opacity-80 transition"
               >
                 <Play className="w-5 h-5 mr-2 fill-black" /> Play
