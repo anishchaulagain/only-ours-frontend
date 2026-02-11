@@ -65,41 +65,30 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
           />
         )}
         
-        {/* Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
-        
-        {/* Content */}
-        <div className="relative z-10 h-full flex flex-col justify-end pb-32 px-4 md:px-12 lg:px-16">
-          <div className="max-w-2xl space-y-4">
-            <p className="text-sm font-medium text-[#DC2626] tracking-wider uppercase">
-              {greeting}{profileName && `, ${profileName}`}
-            </p>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-shadow">
-              Our Memories
-            </h1>
-            
-            <p className="text-base md:text-lg text-gray-300 max-w-lg leading-relaxed">
-              Every moment we've shared, every memory we've made — all in one place. 
-              Our story continues here.
-            </p>
-            
-            <div className="flex items-center gap-3 pt-4">
-              {featured && (
-                <button 
-                  onClick={() => router.push(`/watch/${featured._id}`)}
-                  className="flex items-center gap-2 btn-primary text-base"
-                >
-                  <Play className="w-5 h-5 fill-current" />
-                  Play
-                </button>
-              )}
-              <button className="flex items-center gap-2 btn-secondary text-base">
-                <Info className="w-5 h-5" />
-                More Info
+        <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
+
+        <div className="absolute bottom-[20%] left-4 md:left-16 max-w-xl space-y-4">
+          {profileName && (
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-200 drop-shadow-md mb-2">
+              {greeting}, {profileName}
+            </h2>
+          )}
+          <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg">DIPANS ORGINAL</h1>
+          <p className="text-sm md:text-lg text-gray-200 drop-shadow-md">
+            Dive into the world of cinematic excellence. Experience the thrill, the drama, and the emotion of the best stories ever told. Only on DIPANS.
+          </p>
+          <div className="flex space-x-3 mt-4">
+            {trending.length > 0 && (
+              <button 
+                onClick={() => router.push(`/watch/${trending[0]._id}`)}
+                className="flex items-center px-6 py-2 bg-white text-black rounded font-semibold hover:bg-opacity-80 transition"
+              >
+                <Play className="w-5 h-5 mr-2 fill-black" /> Play
               </button>
-            </div>
+            )}
+            <button className="flex items-center px-6 py-2 bg-gray-500/70 text-white rounded font-semibold hover:bg-gray-500/50 transition">
+              <Info className="w-5 h-5 mr-2" /> More Info
+            </button>
           </div>
         </div>
       </section>
