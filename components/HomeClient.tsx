@@ -45,9 +45,11 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
     );
   }
 
-  const featured = videos[0];
-  const recentMemories = videos.slice(0, 6);
+  const movies = videos.filter(v => v.category === 'movie');
+  const memories = videos.filter(v => v.category === 'memory' || !v.category);
+  const recentMemories = memories.slice(0, 6);
   const favorites = videos.slice(0, 8);
+  const featured = videos[0];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -96,20 +98,39 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
       {/* Content Sections */}
       <main className="relative z-20 -mt-16 pb-20 space-y-10">
         
+        {/* Movies Row */}
+        {movies.length > 0 && (
+          <ContentRow 
+            title="Movies & Originals" 
+            href="/gallery"
+          >
+            {movies.map((video) => (
+              <MemoryCard 
+                key={video._id}
+                id={video._id}
+                title={video.title}
+                thumbnailUrl={video.thumbnailUrl}
+              />
+            ))}
+          </ContentRow>
+        )}
+
         {/* Recent Memories Row */}
-        <ContentRow 
-          title="Recent Memories" 
-          href="/gallery"
-        >
-          {recentMemories.map((video) => (
-            <MemoryCard 
-              key={video._id}
-              id={video._id}
-              title={video.title}
-              thumbnailUrl={video.thumbnailUrl}
-            />
-          ))}
-        </ContentRow>
+        {recentMemories.length > 0 && (
+          <ContentRow 
+            title="Recent Memories" 
+            href="/gallery"
+          >
+            {recentMemories.map((video) => (
+              <MemoryCard 
+                key={video._id}
+                id={video._id}
+                title={video.title}
+                thumbnailUrl={video.thumbnailUrl}
+              />
+            ))}
+          </ContentRow>
+        )}
 
         {/* Favorites Row */}
         {favorites.length > 0 && (
