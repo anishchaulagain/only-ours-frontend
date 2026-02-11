@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
-import VideoRow from "@/components/VideoRow";
-import { Info, Play } from "lucide-react";
+import MemoryCard from "@/components/MemoryCard";
+import { Play, Info, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 interface HomeClientProps {
   videos: any[];
@@ -38,28 +39,31 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#141414] text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="w-12 h-12 border-4 border-[#DC2626] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Simple categorization
-  const trending = videos.slice(0, 5);
-  const top10 = videos.slice(5, 15);
-  const action = videos.filter((v: any) => v.genre.toLowerCase().includes("action"));
-  const exclusives = videos.slice(-5);
+  const featured = videos[0];
+  const recentMemories = videos.slice(0, 6);
+  const favorites = videos.slice(0, 8);
 
   return (
-    <div className="relative min-h-screen bg-[#141414] text-white font-sans selection:bg-red-600 selection:text-white pb-10">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="relative h-[70vh] w-full">
-        <div 
-          className="absolute inset-0 bg-cover bg-center brightness-50"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop')" }}
-        ></div>
+      {/* Hero Section - Netflix Style */}
+      <section className="relative h-[85vh] w-full">
+        {/* Background Image */}
+        {featured && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: `url('${featured.thumbnailUrl || "https://images.unsplash.com/photo-1516961642265-531546e84af2?q=80&w=2600&auto=format&fit=crop"}')`
+            }}
+          />
+        )}
         
         <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
 
@@ -87,36 +91,121 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Video Rows */}
-      <div className="relative z-10 -mt-24 space-y-8">
-        <VideoRow title="Trending Now" videos={trending} />
-        <VideoRow title="Top 10 in Nepal Today" videos={top10.length > 0 ? top10 : trending} />
-        <VideoRow title="Action Movies" videos={action.length > 0 ? action : videos} />
-        <VideoRow title="New Releases" videos={videos} />
-        <VideoRow title="DIPANS Exclusives" videos={exclusives} />
-      </div>
+      {/* Content Sections */}
+      <main className="relative z-20 -mt-16 pb-20 space-y-10">
+        
+        {/* Recent Memories Row */}
+        <ContentRow 
+          title="Recent Memories" 
+          href="/gallery"
+        >
+          {recentMemories.map((video) => (
+            <MemoryCard 
+              key={video._id}
+              id={video._id}
+              title={video.title}
+              thumbnailUrl={video.thumbnailUrl}
+            />
+          ))}
+        </ContentRow>
 
-      {/* Gallery Section */}
-      <div className="px-4 md:px-16 mt-16 space-y-4">
-        <h2 className="text-2xl font-bold mb-4">Picture Gallery</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-           {gallery.map((item: any) => (
-             <div key={item._id} className="relative aspect-video group cursor-pointer overflow-hidden rounded-md">
-                <img 
-                  src={item.imageUrl} 
-                  alt={item.title} 
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                   <p className="text-white font-semibold text-center px-2">{item.title}</p>
+        {/* Favorites Row */}
+        {favorites.length > 0 && (
+          <ContentRow 
+            title="Favorites" 
+            href="/gallery"
+          >
+            {favorites.map((video) => (
+              <MemoryCard 
+                key={video._id}
+                id={video._id}
+                title={video.title}
+                thumbnailUrl={video.thumbnailUrl}
+              />
+            ))}
+          </ContentRow>
+        )}
+
+        {/* Photo Gallery Preview */}
+        {gallery.length > 0 && (
+          <ContentRow 
+            title="Photo Gallery" 
+            href="/gallery"
+          >
+            {gallery.slice(0, 8).map((item: any) => (
+              <div 
+                key={item._id}
+                className="flex-shrink-0 w-[200px] md:w-[240px] aspect-[3/4] rounded overflow-hidden group cursor-pointer card-hover"
+              >
+                <div className="relative w-full h-full">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="thumbnail-overlay flex items-end p-3">
+                    <p className="text-sm font-medium">{item.title}</p>
+                  </div>
                 </div>
-             </div>
-           ))}
-           {gallery.length === 0 && <p className="text-gray-500">No images available yet.</p>}
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* Empty State */}
+        {videos.length === 0 && gallery.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-32 px-4">
+            <p className="text-gray-400 text-lg text-center">
+              No memories yet. Start creating your story together.
+            </p>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-[#262626] py-8 px-4 md:px-12 lg:px-16">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-2xl font-semibold">
+            D<span className="text-[#DC2626]">&</span>D
+          </p>
+          <p className="text-sm text-gray-500">
+            Made with love. Forever and always.
+          </p>
         </div>
-      </div>
+      </footer>
     </div>
+  );
+}
+
+// Content Row Component
+function ContentRow({ 
+  title, 
+  href, 
+  children 
+}: { 
+  title: string; 
+  href: string; 
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="px-4 md:px-12 lg:px-16">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg md:text-xl font-semibold text-white">
+          {title}
+        </h2>
+        <Link 
+          href={href}
+          className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors"
+        >
+          See all <ChevronRight className="w-4 h-4" />
+        </Link>
+      </div>
+      
+      <div className="row-scroll scrollbar-hide -mx-4 px-4 md:-mx-12 md:px-12 lg:-mx-16 lg:px-16">
+        {children}
+      </div>
+    </section>
   );
 }

@@ -2,108 +2,116 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Bell, Search, LogOut } from "lucide-react";
+import { Search, Bell, ChevronDown, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    setIsDropdownOpen(false);
-    logout();
-  };
-
-  useEffect(() => {
-    const closeDropdown = (e: MouseEvent) => {
-      // Close if clicking anywhere outside (simplified)
-      // In a real app, check if target is inside the dropdown ref
-       if (isDropdownOpen) {
-          setIsDropdownOpen(false);
-       }
-    };
-    
-    // Add a small delay/check or use a specific ref to avoid immediate closing if clicking the toggle button
-    // For simplicity, we'll just rely on the toggle button's onClick (which might need stopPropagation if we use window click)
-    // Actually, a better way for "click outside" without refs for this specific snippet:
-    if(isDropdownOpen) {
-        window.addEventListener('click', closeDropdown);
-    }
-    
-    return () => window.removeEventListener('click', closeDropdown);
-  }, [isDropdownOpen]);
-
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
-      className={`fixed top-0 w-full z-[100] transition-all duration-300 ${
-        isScrolled ? "bg-black/90" : "bg-gradient-to-b from-black/80 to-transparent"
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled 
+          ? "bg-[#0a0a0a]/95 backdrop-blur-sm" 
+          : "bg-gradient-to-b from-[#0a0a0a]/80 to-transparent"
       }`}
     >
-      <div className="px-4 md:px-16 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="text-red-600 text-3xl font-bold cursor-pointer">
-            DIPANS
+      <div className="flex items-center justify-between px-4 md:px-12 lg:px-16 h-16">
+        {/* Left Section */}
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <Link 
+            href="/" 
+            className="text-2xl font-bold text-white hover:text-[#DC2626] transition-colors"
+          >
+            D<span className="text-[#DC2626]">&</span>D
           </Link>
-          <ul className="hidden md:flex space-x-4 text-sm font-light text-gray-300">
-            <li className="cursor-pointer hover:text-white transition">Home</li>
-            <li className="cursor-pointer hover:text-white transition">Series</li>
-            <li className="cursor-pointer hover:text-white transition">Films</li>
-            <li className="cursor-pointer hover:text-white transition">New & Popular</li>
-            <li className="cursor-pointer hover:text-white transition">My List</li>
-          </ul>
+          
+          {/* Nav Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <NavLink href="/" active>Home</NavLink>
+            <NavLink href="/gallery">Gallery</NavLink>
+            <NavLink href="/story">Our Story</NavLink>
+          </div>
         </div>
-        <div className="flex items-center space-x-4 text-white">
-          <Search className="w-5 h-5 cursor-pointer hover:text-gray-300 transition" />
-          <span className="text-sm cursor-pointer hover:text-gray-300 transition hidden sm:inline">
-            {user ? user.username : "Guest"}
-          </span>
-          <Bell className="w-5 h-5 cursor-pointer hover:text-gray-300 transition" />
-              <div className="relative group">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsDropdownOpen(!isDropdownOpen);
-                  }}
-                  className="w-8 h-8 bg-blue-600 rounded cursor-pointer flex items-center justify-center font-bold uppercase focus:outline-none"
-                >
-                  {user ? user.username[0] : "G"}
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-32 bg-black border border-gray-700 rounded shadow-xl z-50">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLogout();
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition text-left"
-                    >
-                      <LogOut className="w-4 h-4 mr-2" /> Logout
-                    </button>
-                  </div>
-                )}
+
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
+          {/* Search */}
+          <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <Search className="w-5 h-5" />
+          </button>
+          
+          {/* Notifications */}
+          <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <Bell className="w-5 h-5" />
+          </button>
+          
+          {/* Profile Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 focus:outline-none"
+            >
+              <div className="w-8 h-8 rounded bg-[#DC2626] flex items-center justify-center text-white font-medium text-sm">
+                {user ? user.username[0].toUpperCase() : "G"}
               </div>
+              <ChevronDown className={`w-4 h-4 text-white transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-[#141414] border border-[#262626] rounded shadow-xl z-50 py-1">
+                <div className="px-4 py-3 border-b border-[#262626]">
+                  <p className="text-sm font-medium text-white">{user?.username}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
+                </div>
+                <button
+                  onClick={logout}
+                  className="flex items-center w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1a1a1a] hover:text-white transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>
   );
 };
+
+function NavLink({ 
+  href, 
+  children, 
+  active = false 
+}: { 
+  href: string; 
+  children: React.ReactNode;
+  active?: boolean;
+}) {
+  return (
+    <Link 
+      href={href} 
+      className={`text-sm font-medium transition-colors ${
+        active 
+          ? "text-white" 
+          : "text-gray-400 hover:text-gray-200"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export default Navbar;
