@@ -15,11 +15,12 @@ export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [videos, setVideos] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
 
   // Form states
   const [newUser, setNewUser] = useState({ username: "", email: "", password: "", role: "user" });
-  const [newVideo, setNewVideo] = useState({ title: "", description: "", videoUrl: "", thumbnailUrl: "", genre: "", duration: "", year: 2025 });
-  const [newImage, setNewImage] = useState({ title: "", imageUrl: "", description: "" });
+  const [newVideo, setNewVideo] = useState({ title: "", description: "", videoUrl: "", thumbnailUrl: "", genre: "", category: "", duration: "", year: 2025 });
+  const [newImage, setNewImage] = useState({ title: "", imageUrl: "", category: "", description: "" });
 
   useEffect(() => {
     if (!authLoading) {
@@ -37,19 +38,22 @@ export default function AdminPage() {
       
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [usersRes, videosRes, galleryRes] = await Promise.all([
+      const [usersRes, videosRes, galleryRes, categoriesRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, { headers }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/gallery`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`),
       ]);
 
       const usersData = await usersRes.json();
       const videosData = await videosRes.json();
       const galleryData = await galleryRes.json();
+      const categoriesData = await categoriesRes.json();
 
       setUsers(usersData);
       setVideos(videosData);
       setGallery(galleryData);
+      setCategories(categoriesData);
       
       const genres = new Set(videosData.map((v: any) => v.genre));
       setStats({ users: usersData.length, videos: videosData.length, distinctGenres: genres.size });
@@ -94,7 +98,7 @@ export default function AdminPage() {
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
               body: JSON.stringify(newVideo)
           });
-          setNewVideo({ title: "", description: "", videoUrl: "", thumbnailUrl: "", genre: "", duration: "", year: 2025 });
+          setNewVideo({ title: "", description: "", videoUrl: "", thumbnailUrl: "", genre: "", category: "", duration: "", year: 2025 });
           fetchData();
           alert("Video added!");
       } catch (error) { console.error(error); }
@@ -108,7 +112,7 @@ export default function AdminPage() {
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
               body: JSON.stringify(newImage)
           });
-          setNewImage({ title: "", imageUrl: "", description: "" });
+          setNewImage({ title: "", imageUrl: "", category: "", description: "" });
           fetchData();
           alert("Image added!");
       } catch (error) { console.error(error); }
@@ -223,6 +227,17 @@ export default function AdminPage() {
                         <input type="text" placeholder="Thumbnail URL" className="p-2 bg-[#333] rounded" value={newVideo.thumbnailUrl} onChange={e => setNewVideo({...newVideo, thumbnailUrl: e.target.value})} required />
                         <input type="text" placeholder="Genre" className="p-2 bg-[#333] rounded" value={newVideo.genre} onChange={e => setNewVideo({...newVideo, genre: e.target.value})} required />
                          <input type="number" placeholder="Year" className="p-2 bg-[#333] rounded" value={newVideo.year} onChange={e => setNewVideo({...newVideo, year: parseInt(e.target.value)})} />
+                        <select 
+                            className="p-2 bg-[#333] rounded md:col-span-2" 
+                            value={newVideo.category} 
+                            onChange={e => setNewVideo({...newVideo, category: e.target.value})}
+                            required
+                        >
+                            <option value="">Select Video Category</option>
+                            {categories.filter(c => c.type === 'video').map(c => (
+                                <option key={c._id} value={c.name}>{c.name}</option>
+                            ))}
+                        </select>
                         <button type="submit" className="md:col-span-2 bg-red-600 p-2 rounded font-bold hover:bg-red-700">Add Movie</button>
                     </form>
                 </div>
@@ -233,7 +248,7 @@ export default function AdminPage() {
                            <img src={v.thumbnailUrl} alt={v.title} className="w-full h-32 object-cover" />
                            <div className="p-2">
                                <h4 className="font-bold truncate">{v.title}</h4>
-                               <p className="text-xs text-gray-400">{v.genre}</p>
+                               <p className="text-xs text-gray-400">{v.genre} • {v.category}</p>
                            </div>
                            <button onClick={() => handleDelete("videos", v._id)} className="absolute top-2 right-2 bg-red-600 p-1 rounded text-white opacity-0 group-hover:opacity-100 transition"><Trash2 className="w-4 h-4" /></button>
                         </div>
@@ -250,6 +265,17 @@ export default function AdminPage() {
                     <form onSubmit={handleCreateImage} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" placeholder="Title" className="p-2 bg-[#333] rounded" value={newImage.title} onChange={e => setNewImage({...newImage, title: e.target.value})} required />
                         <input type="text" placeholder="Image URL" className="p-2 bg-[#333] rounded" value={newImage.imageUrl} onChange={e => setNewImage({...newImage, imageUrl: e.target.value})} required />
+                        <select 
+                            className="p-2 bg-[#333] rounded md:col-span-2" 
+                            value={newImage.category} 
+                            onChange={e => setNewImage({...newImage, category: e.target.value})}
+                            required
+                        >
+                            <option value="">Select Image Category</option>
+                            {categories.filter(c => c.type === 'image').map(c => (
+                                <option key={c._id} value={c.name}>{c.name}</option>
+                            ))}
+                        </select>
                         <input type="text" placeholder="Description" className="p-2 bg-[#333] rounded md:col-span-2" value={newImage.description} onChange={e => setNewImage({...newImage, description: e.target.value})} />
                         <button type="submit" className="md:col-span-2 bg-red-600 p-2 rounded font-bold hover:bg-red-700">Add Image</button>
                     </form>

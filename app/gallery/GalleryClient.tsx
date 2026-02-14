@@ -99,6 +99,7 @@ export default function GalleryClient({ videos, gallery }: GalleryClientProps) {
                   <p className="mt-2 text-sm text-gray-300 truncate group-hover:text-white transition-colors">
                     {video.title}
                   </p>
+                  <p className="text-xs text-gray-500 truncate">{video.category}</p>
                 </Link>
               ))}
             </div>

@@ -11,9 +11,10 @@ import Link from "next/link";
 interface HomeClientProps {
   videos: any[];
   gallery: any[];
+  categories: any[];
 }
 
-export default function HomeClient({ videos, gallery }: HomeClientProps) {
+export default function HomeClient({ videos, gallery, categories }: HomeClientProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [greeting, setGreeting] = useState("");
@@ -45,8 +46,9 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
     );
   }
 
-  const movies = videos.filter(v => v.category === 'movie');
-  const memories = videos.filter(v => v.category === 'memory' || !v.category);
+  // Filter categories for videos
+  const videoCategories = categories.filter(cat => cat.type === "video");
+  const memories = videos.filter(v => (!v.category || v.category === 'memory'));
   const recentMemories = memories.slice(0, 6);
   const favorites = videos.slice(0, 8);
   const featured = videos[0];
@@ -98,25 +100,31 @@ export default function HomeClient({ videos, gallery }: HomeClientProps) {
       {/* Content Sections */}
       <main className="relative z-20 -mt-16 pb-20 space-y-10">
         
-        {/* Movies Row */}
-        {movies.length > 0 && (
-          <ContentRow 
-            title="Movies & Originals" 
-            href="/gallery"
-          >
-            {movies.map((video) => (
-              <MemoryCard 
-                key={video._id}
-                id={video._id}
-                title={video.title}
-                thumbnailUrl={video.thumbnailUrl}
-              />
-            ))}
-          </ContentRow>
-        )}
+        {/* Dynamic Video Category Rows */}
+        {videoCategories.map((cat) => {
+          const catVideos = videos.filter(v => v.category === cat.name);
+          if (catVideos.length === 0) return null;
+          
+          return (
+            <ContentRow 
+              key={cat._id}
+              title={cat.name.charAt(0).toUpperCase() + cat.name.slice(1) + (cat.name === 'movie' ? 's & Originals' : 's')} 
+              href="/gallery"
+            >
+              {catVideos.map((video) => (
+                <MemoryCard 
+                  key={video._id}
+                  id={video._id}
+                  title={video.title}
+                  thumbnailUrl={video.thumbnailUrl}
+                />
+              ))}
+            </ContentRow>
+          );
+        })}
 
-        {/* Recent Memories Row */}
-        {recentMemories.length > 0 && (
+        {/* Recent Memories Row (Fallback/Legacy) */}
+        {recentMemories.length > 0 && !videoCategories.some(c => c.name === 'memory') && (
           <ContentRow 
             title="Recent Memories" 
             href="/gallery"
